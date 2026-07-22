@@ -1,6 +1,6 @@
-const mongoose = require("mongoose");
-const bcrypt = require("bcrypt");
-const mongooseUniqueValidator = require("mongoose-unique-validator");
+import mongoose from "mongoose";
+import bcrypt from "bcrypt";
+import mongooseUniqueValidator from "mongoose-unique-validator";
 
 const userSchema = new mongoose.Schema(
   {
@@ -55,4 +55,4 @@ userSchema.methods.comparePassword = async function (passwordToCheck) {
   return await bcrypt.compare(passwordToCheck, this.password);
 };
 
-module.exports = mongoose.model("User", userSchema);
+export default mongoose.model("User", userSchema);
