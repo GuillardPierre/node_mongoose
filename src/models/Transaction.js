@@ -56,7 +56,28 @@ const transactionSchema = new mongoose.Schema(
       index: true,
     },
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+    toJSON: {
+      transform: function (doc, ret) {
+        let accountId = ret.account_id;
+        if (ret.account_id && ret.account_id._id) {
+          accountId = ret.account_id._id;
+        }
+        ret._links = {
+          update: {
+            href: `/api/accounts/${accountId}/transactions/${ret._id}`,
+            method: "PUT",
+          },
+          delete: {
+            href: `/api/accounts/${accountId}/transactions/${ret._id}`,
+            method: "DELETE",
+          },
+        };
+        return ret;
+      },
+    },
+  }
 );
 
 export default mongoose.model("Transaction", transactionSchema);

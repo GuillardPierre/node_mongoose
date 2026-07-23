@@ -16,7 +16,31 @@ const accountSchema = new mongoose.Schema(
       index: true,
     },
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+    toJSON: {
+      transform: function (doc, ret) {
+        const id = ret._id;
+        ret._links = {
+          update: { href: `/api/accounts/${id}`, method: "PATCH" },
+          delete: { href: `/api/accounts/${id}`, method: "DELETE" },
+          create_transaction: {
+            href: `/api/accounts/${id}/transactions`,
+            method: "POST",
+          },
+          transactions: {
+            href: `/api/accounts/${id}/transactions`,
+            method: "GET",
+          },
+          pending_transactions: {
+            href: `/api/accounts/${id}/transactions/pending`,
+            method: "GET",
+          },
+        };
+        return ret;
+      },
+    },
+  }
 );
 
 cascadeDelete(accountSchema);

@@ -1,16 +1,20 @@
+import jwt from "jsonwebtoken";
 import User from "../models/User.js";
 
 const auth = async (req, res, next) => {
   try {
-    const userId = req.headers["x-user-id"] || req.query.user_id;
+    const header = req.headers.authorization;
 
-    if (!userId) {
+    if (!header || !header.startsWith("Bearer ")) {
       return res.status(401).json({
-        error: "Authentication required. Please provide x-user-id header",
+        error: "Authentication required. Please provide a Bearer token",
       });
     }
 
-    const user = await User.findById(userId);
+    const token = header.split(" ")[1];
+    const payload = jwt.verify(token, process.env.JWT_SECRET);
+
+    const user = await User.findById(payload.userId);
     if (!user) {
       return res.status(401).json({
         error: "Invalid user",
@@ -22,7 +26,7 @@ const auth = async (req, res, next) => {
     next();
   } catch (error) {
     res.status(401).json({
-      error: "Authentication failed",
+      error: "Invalid or expired token",
     });
   }
 };
